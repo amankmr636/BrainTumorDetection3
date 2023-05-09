@@ -202,6 +202,9 @@ class BTdetect2:
 
 
        def refresh(self):
+           
+           self.player = tkvideo("C:\V11.mp4", self.video, loop=1000, size=(380, 400))
+ 
            self.player.play()
 
            self.rexha = Label(self.root, bd=10, relief=RIDGE,
