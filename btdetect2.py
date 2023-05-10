@@ -11,6 +11,8 @@ import datetime
 from keras.models import load_model
 from PIL import Image
 from register import Register
+from chatbotml import Mlbot
+from chatbotdl import ChatbotDL
 
 engine=pyttsx3.init('sapi5')
 voices=engine.getProperty('voices')
@@ -145,24 +147,32 @@ class BTdetect2:
 
            btnsave= Button(lbltitle3, bg="darkgreen", height=1, width=10, text="Save", fg="white",
                            font=("Helvetica", 15, "bold italic"),command=self.save)
-           btnsave.place(x=0, y=0,height=80,width=155)
+           btnsave.place(x=0, y=0,height=60,width=155)
 
            btnplot= Button(lbltitle3, bg="purple", height=1, width=10, text="Plot", fg="white",
                            font=("Helvetica", 15, "bold italic"),command=self.plot)
-           btnplot.place(x=0, y=81,height=80,width=155)
+           btnplot.place(x=0, y=60,height=60,width=155)
 
            btnclr= Button(lbltitle3, bg="brown", height=1, width=10, text="Clear", fg="white",
                            font=("Helvetica", 15, "bold italic"),command=self.clear)
-           btnclr.place(x=0, y=161,height=80,width=155)
+           btnclr.place(x=0, y=120,height=60,width=155)
 
            btndoc= Button(lbltitle3, bg="blue",fg="white", height=1, width=10, text="Search",
                            font=("Helvetica", 15, "bold italic"),command=self.search)
-           btndoc.place(x=0, y=241,height=80,width=155)
+           btndoc.place(x=0, y=180,height=60,width=155)
 
            btnexit= Button(lbltitle3, bg="gray",  width=10, text="Exit", fg="white",
                            font=("Helvetica", 15, "bold italic"),command=self.root.destroy)
-           btnexit.place(x=0, y=321,height=60,width=155)
+           btnexit.place(x=0, y=240,height=60,width=155)
 
+
+           btnchat= Button(lbltitle3, bg="skyblue",  width=10, text="BOT", fg="white",
+                           font=("Helvetica", 15, "bold italic"),command=self.chatbot)
+           btnchat.place(x=0, y=300,height=81,width=77)
+
+           btnchatml= Button(lbltitle3, bg="orange",  width=10, text="MLBOT", fg="white",
+                           font=("Helvetica", 15, "bold italic"),command=self.chatml)
+           btnchatml.place(x=77, y=300,height=81,width=77)
 
            #=========================DetailFrameDetails=========================================================================
 
@@ -232,7 +242,12 @@ class BTdetect2:
        def reg(self):
            self.new_window = Toplevel(self.root)
            self.app = Register(self.new_window)
-
+       def chatbot(self):
+           self.new_window = Toplevel(self.root)
+           self.app = ChatbotDL(self.new_window)
+       def chatml(self):
+           self.new_window = Toplevel(self.root)
+           self.app = Mlbot(self.new_window)
        def save(self):
 
            conn = mysql.connector.connect(host="localhost", username="root", password="Aman9174245164@",database="pharma")
@@ -319,7 +334,7 @@ class BTdetect2:
            model.add(MaxPooling2D(pool_size=(2, 2)))
 
            model.add(Flatten())
-           model.add(Dense(64))  #
+           model.add(Dense(64))
            model.add(Activation('relu'))
            model.add(Dropout(0.5))
            model.add(Dense(2))
