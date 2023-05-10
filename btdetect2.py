@@ -349,11 +349,11 @@ class BTdetect2:
            plt.show()
 
        def clear(self):
-           self.var01.set("")
-           self.var02.set("")
+           self.var01.set("ReportID")
+           self.var02.set("PatientID")
 
-           self.var04.set("")
-           self.var05.set("")
+           self.var04.set("Doctor ID")
+           self.var05.set("Tumor/No Tumor")
 
        def find(self):
            import webbrowser
@@ -399,19 +399,18 @@ class BTdetect2:
                self.text2.insert(END,results)
 
        def clicked2(self):
-           query = self.takecommand().lower()
-
+           query = self.takecommand1().lower()
+           query = query.replace(" ", "")
            imgbrn = Image.open(
-               "C:/" + "Users/Aman Kumar/PycharmProjects/pythonProject/pred/" + self.var01.get() + ".jpg")
+               "C:/" + "Users/Aman Kumar/PycharmProjects/pythonProject/pred/" + query + ".jpg")
            imgbrn = imgbrn.resize((220, 400))
 
+
            self.photoimgbrn = ImageTk.PhotoImage(imgbrn)
-
            self.video = Label(self.root, bd=10, relief=RIDGE,
-                              bg='black', fg="darkgreen", font=("times new roman", 50, "bold"), image=self.photoimgbrn,
-                              padx=2, pady=4, height=500)
+                            bg='black', fg="darkgreen", font=("times new roman", 50, "bold"),image=self.photoimgbrn,
+                              padx=2, pady=4,height=500)
            self.video.place(x=880, y=104, width=401, height=401)
-
            btnref = Button(self.video, text="Refresh", font=("times new roman", 10, "bold italic"), borderwidth=0,bg="black",fg="black",width=280,command=self.refresh)
            btnref.pack(side=BOTTOM)
 
@@ -421,8 +420,7 @@ class BTdetect2:
 
            model = load_model('BrainAman.h5')
 
-           image = cv2.imread(
-               "C:/" + "Users/Aman Kumar/PycharmProjects/pythonProject/pred/" + self.var01.get() + ".jpg")
+           image = cv2.imread("C:/" + "Users/Aman Kumar/PycharmProjects/pythonProject/pred/" + query + ".jpg")
 
            img = Image.fromarray(image)
            img = img.resize((64, 64))
@@ -432,7 +430,9 @@ class BTdetect2:
            predict_x = model.predict(input_img)
            result = np.argmax(predict_x, axis=1)
 
-           if result[0] == 1:
+           print(result)
+
+           if result[0]==1:
                self.var05.set("Tumor")
                Result = Label(self.root, bd=10, relief=RIDGE, text="Tumor", bg="black", fg="red",
                               font=("times new roman", 38, "bold italic"), anchor="c")
@@ -445,8 +445,11 @@ class BTdetect2:
                Result.place(x=881, y=505, width=400, height=150)
 
 
+
+
        def clicked3(self):
-           query = self.takecommand().lower()
+           query = self.takecommand2().lower()
+           query=query.replace(" ", "")
            conn = mysql.connector.connect(host="localhost", username="root", password="Aman9174245164@",
                                         database="pharma")
            mycursor = conn.cursor()
@@ -470,6 +473,39 @@ class BTdetect2:
            r = sr.Recognizer()
            with sr.Microphone() as source:
                speak("Go Ahead I am Listening")
+               audio = r.listen(source)
+           try:
+               speak("Recognizing")
+               query = r.recognize_google(audio, language='en-in')
+
+           except Exception as e:
+               speak("Sorry!!Say that again please")
+               query = ''
+
+           return query
+
+
+       def takecommand1(self):
+
+           r = sr.Recognizer()
+           with sr.Microphone() as source:
+               speak("What is your Report ID sir?")
+               audio = r.listen(source)
+           try:
+               speak("Recognizing")
+               query = r.recognize_google(audio, language='en-in')
+
+           except Exception as e:
+               speak("Sorry!!Say that again please")
+               query = ''
+
+           return query
+
+       def takecommand2(self):
+
+           r = sr.Recognizer()
+           with sr.Microphone() as source:
+               speak("What is your Patient ID sir?")
                audio = r.listen(source)
            try:
                speak("Recognizing")
