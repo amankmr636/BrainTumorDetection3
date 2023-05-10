@@ -7,11 +7,10 @@ import wikipedia
 from tkinter import messagebox
 import speech_recognition as sr
 from tkvideo import tkvideo
-import cv2
+import datetime
 from keras.models import load_model
 from PIL import Image
-import numpy as np
-
+from register import Register
 
 engine=pyttsx3.init('sapi5')
 voices=engine.getProperty('voices')
@@ -33,10 +32,13 @@ class BTdetect2:
            self.var04 = StringVar()
            self.var05 = StringVar()
 
+           tim = datetime.datetime.now().date()
+           self.var03 = str(tim)
+
            self.root=root
            self.root.title("phaREXHA")
            self.root.geometry("1550x800+0+0")
-           self.root.attributes("-alpha", 1)
+           self.root.attributes("-alpha", 1 )
            lbltitle=Label(self.root, text="Tumor Detector", bd=10, relief=RIDGE,
                             bg='black', fg="darkgreen", font=("times new roman", 50, "bold"),padx=2, pady=4)
            lbltitle.pack(side=TOP, fill=X)
@@ -103,7 +105,7 @@ class BTdetect2:
            self.entrypid.place(x=220,y=25)
 
 
-           self.entrydate = Entry(lbltitle2 ,bg="black",fg="green",font=("HELVETICA", 15, " italic"), width=15,textvariable=self.var03)
+           self.entrydate = Entry(lbltitle2 ,bg="black",fg="white",font=("HELVETICA", 15, " italic"), width=15,textvariable=self.var03)
            self.entrydate.place(x=20,y=75)
 
 
@@ -120,21 +122,26 @@ class BTdetect2:
            self.entryage.insert(0,"DoctorID")
            self.entryrid.insert(0,"ReportID")
            self.entrypid.insert(0,"PatientID")
-           self.entrydate.insert(0,"Date")
+           self.entrydate.insert(0,self.var03)
            self.entryres.insert(0, "Tumor/No Tumor")
            self.text1.insert(END, "***Enter Reportno in ReportID field and "
                                 "click on predict to get the result***"
                                 "*Enter PatientID and click on Search to get all the "
                                 "past reports***")
 
-           btnres= Button(lbltitle4, bg="black", height=1, width=15, text="Predict", fg="red",
+           btnres= Button(lbltitle4, bg="black", height=1,  text="Predict", fg="red",
                            font=("Helvetica", 15, "bold italic"),command=self.result)
-           btnres.place(x=0, y=0,height=80,width=200)
+           btnres.place(x=0, y=0,height=80,width=130)
 
 
-           btnres2= Button(lbltitle4, bg="black",height=1, width=15, text="Read", fg="red",
+           btnres2= Button(lbltitle4, bg="black",height=1,  text="Register", fg="red",
+                           font=("Helvetica", 15, "bold italic"),command=self.reg)
+           btnres2.place(x=130, y=0,height=80,width=130)
+
+           btnres3= Button(lbltitle4, bg="black",height=1,  text="Read", fg="red",
                            font=("Helvetica", 15, "bold italic"),command=self.find)
-           btnres2.place(x=201, y=0,height=80,width=200)
+           btnres3.place(x=260, y=0,height=80,width=142)
+
 
            btnsave= Button(lbltitle3, bg="darkgreen", height=1, width=10, text="Save", fg="white",
                            font=("Helvetica", 15, "bold italic"),command=self.save)
@@ -152,20 +159,13 @@ class BTdetect2:
                            font=("Helvetica", 15, "bold italic"),command=self.search)
            btndoc.place(x=0, y=241,height=80,width=155)
 
-           btnexit= Button(lbltitle3, bg="black",  width=10, text="Exit", fg="white",
+           btnexit= Button(lbltitle3, bg="gray",  width=10, text="Exit", fg="white",
                            font=("Helvetica", 15, "bold italic"),command=self.root.destroy)
            btnexit.place(x=0, y=321,height=60,width=155)
 
 
-
-
-
-
-
-
-
-
            #=========================DetailFrameDetails=========================================================================
+
            ScrollX = ttk.Scrollbar(DetailFrame, orient=HORIZONTAL)
            ScrollY = ttk.Scrollbar(DetailFrame, orient=VERTICAL)
 
@@ -202,14 +202,23 @@ class BTdetect2:
 
 
        def refresh(self):
-           
+
            self.player = tkvideo("C:\V11.mp4", self.video, loop=1000, size=(380, 400))
- 
            self.player.play()
 
            self.rexha = Label(self.root, bd=10, relief=RIDGE,
                             bg='black', fg="darkgreen",image=self.photoimgrx, font=("times new roman", 50, "bold"),padx=2, pady=4,height=500)
            self.rexha.place(x=599, y=104, width=280, height=401)
+
+           Result = Label(self.root, bd=10, relief=RIDGE,text="Result",bg="black",fg="gray",
+                          font=("times new roman", 38, "bold italic"),anchor="c")
+           Result.place(x=880, y=505, width=401, height=150)
+
+
+           Result = Label(self.root, bd=10, relief=RIDGE,text="Result",bg="black",fg="gray",
+                          font=("times new roman", 38, "bold italic"),anchor="c")
+           Result.place(x=880, y=505, width=401, height=150)
+
 
            btnask = Button(self.rexha, text="Ask", borderwidth=0, font=("times new roman", 10, "bold italic"),bg="black",fg="darkgreen",command=self.clicked1,width=280)
            btnask.pack(side=BOTTOM)
@@ -220,6 +229,9 @@ class BTdetect2:
 
 
 
+       def reg(self):
+           self.new_window = Toplevel(self.root)
+           self.app = Register(self.new_window)
 
        def save(self):
 
@@ -227,7 +239,7 @@ class BTdetect2:
            mycursor = conn.cursor()
            mycursor.execute("insert into tumordetection(ReportID,PatientID,Date,DoctorID,Tumor) values(%s,%s,%s,%s,%s)", (self.var01.get(),
                                                                                                                      self.var02.get(),
-                                                                                                            self.var03.get(),
+                                                                                                            self.var03,
                                                                                                                      self.var04.get(),
                                                                                                                      self.var05.get(),))
            conn.commit()
@@ -339,7 +351,7 @@ class BTdetect2:
        def clear(self):
            self.var01.set("")
            self.var02.set("")
-           self.var03.set("")
+
            self.var04.set("")
            self.var05.set("")
 
@@ -394,10 +406,12 @@ class BTdetect2:
            imgbrn = imgbrn.resize((220, 400))
 
            self.photoimgbrn = ImageTk.PhotoImage(imgbrn)
+
            self.video = Label(self.root, bd=10, relief=RIDGE,
                               bg='black', fg="darkgreen", font=("times new roman", 50, "bold"), image=self.photoimgbrn,
                               padx=2, pady=4, height=500)
            self.video.place(x=880, y=104, width=401, height=401)
+
            btnref = Button(self.video, text="Refresh", font=("times new roman", 10, "bold italic"), borderwidth=0,bg="black",fg="black",width=280,command=self.refresh)
            btnref.pack(side=BOTTOM)
 
