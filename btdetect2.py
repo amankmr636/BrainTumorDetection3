@@ -172,7 +172,7 @@ class BTdetect2:
 
            btnchatml= Button(lbltitle3, bg="orange",  width=10, text="MLBOT", fg="white",
                            font=("Helvetica", 15, "bold italic"),command=self.chatml)
-           btnchatml.place(x=77, y=300,height=81,width=77)
+           btnchatml.place(x=77, y=300,height=81,width=78)
 
            #=========================DetailFrameDetails=========================================================================
 
