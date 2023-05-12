@@ -36,6 +36,9 @@ class BTdetect2:
 
            tim = datetime.datetime.now().date()
            self.var03 = str(tim)
+           self.i,self.j,self.k=self.var03.split("-")
+           self.var03=self.i+self.j+self.k
+
 
            self.root=root
            self.root.title("phaREXHA")
@@ -248,25 +251,22 @@ class BTdetect2:
        def chatml(self):
            self.new_window = Toplevel(self.root)
            self.app = Mlbot(self.new_window)
+
        def save(self):
-           self.i,self.j,self.k=self.var03.split("-")
-           self.var03=self.i+self.j+self.k
 
            conn = mysql.connector.connect(host="localhost", username="root", password="Aman9174245164@",database="pharma")
            mycursor = conn.cursor()
            mycursor.execute("insert into tumordetection(ReportID,PatientID,Date,DoctorID,Tumor) values(%s,%s,%s,%s,%s)", (self.var01.get(),
-                                                                                                                     self.var02.get(),
-                                                                                                                          self.var03,
+                                                                                                                     self.var02.get(),self.var03,
                                                                                                                      self.var04.get(),
                                                                                                                      self.var05.get(),))
            conn.commit()
-
            conn.close()
            messagebox.showinfo("Success","Data Updated")
 
+
        def plot(self):
 
-          import matplotlib.pyplot as plt
           conn = mysql.connector.connect(host="localhost", username="root", password="Aman9174245164@",
                                          database="pharma")
           mycursor = conn.cursor()
@@ -305,7 +305,7 @@ class BTdetect2:
                                  font=("times new roman", 38, "bold italic"), anchor="c")
                   Result.place(x=881, y=505, width=400, height=150)
 
-              k = messagebox.askyesno(self.var02.get(), "Next MRI")
+              k = messagebox.askyesno(row[0][0],self.var02.get()+"Next MRI")
 
 
 
