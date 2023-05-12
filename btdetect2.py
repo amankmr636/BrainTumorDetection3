@@ -249,12 +249,14 @@ class BTdetect2:
            self.new_window = Toplevel(self.root)
            self.app = Mlbot(self.new_window)
        def save(self):
+           self.i,self.j,self.k=self.var03.split("-")
+           self.var03=self.i+self.j+self.k
 
            conn = mysql.connector.connect(host="localhost", username="root", password="Aman9174245164@",database="pharma")
            mycursor = conn.cursor()
            mycursor.execute("insert into tumordetection(ReportID,PatientID,Date,DoctorID,Tumor) values(%s,%s,%s,%s,%s)", (self.var01.get(),
                                                                                                                      self.var02.get(),
-                                                                                                            self.var03,
+                                                                                                                          self.var03,
                                                                                                                      self.var04.get(),
                                                                                                                      self.var05.get(),))
            conn.commit()
