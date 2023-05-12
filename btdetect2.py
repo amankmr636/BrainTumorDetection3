@@ -315,6 +315,16 @@ class BTdetect2:
            self.var02.set("PatientID")
            self.var04.set("Doctor ID")
            self.var05.set("Tumor/No Tumor")
+           self.video = Label(self.root, bd=10, relief=RIDGE,
+                              bg='black', fg="darkgreen", font=("times new roman", 50, "bold"), padx=2, pady=4,
+                              height=500)
+           self.video.place(x=881, y=105, width=400, height=400)
+
+           self.player = tkvideo("C:\V11.mp4", self.video, loop=1000, size=(380, 400))
+           self.player.play()
+           Result = Label(self.root, bd=10, relief=RIDGE,text="Result",bg="black",fg="gray",
+                          font=("times new roman", 38, "bold italic"),anchor="c")
+           Result.place(x=880, y=505, width=401, height=150)
 
        def find(self):
            import webbrowser
