@@ -149,7 +149,7 @@ class BTdetect2:
                            font=("Helvetica", 15, "bold italic"),command=self.save)
            btnsave.place(x=0, y=0,height=60,width=155)
 
-           btnplot= Button(lbltitle3, bg="purple", height=1, width=10, text="Plot", fg="white",
+           btnplot= Button(lbltitle3, bg="purple", height=1, width=10, text="Show All", fg="white",
                            font=("Helvetica", 15, "bold italic"),command=self.plot)
            btnplot.place(x=0, y=60,height=60,width=155)
 
@@ -263,110 +263,56 @@ class BTdetect2:
            messagebox.showinfo("Success","Data Updated")
 
        def plot(self):
-           import cv2
-           import os
-           from PIL import Image
-           import numpy as np
-           from sklearn.model_selection import train_test_split
-           from keras.layers import Conv2D, MaxPooling2D
-           from keras.layers import Activation, Dropout, Flatten, Dense
-           from keras.utils import normalize
-           from keras.utils import to_categorical
 
-           image_directory = "datasets/"
+          import matplotlib.pyplot as plt
+          conn = mysql.connector.connect(host="localhost", username="root", password="Aman9174245164@",
+                                         database="pharma")
+          mycursor = conn.cursor()
+          mycursor.execute("Select Date from tumordetection where PatientID=%s", (self.var02.get(),))
+          row = mycursor.fetchall()
 
-           no_tumor_images = os.listdir(image_directory + 'no/')
-           yes_tumor_images = os.listdir(image_directory + 'yes/')
+          k=1;
+          for i in row:
+            if (k > 0):
+              conn = mysql.connector.connect(host="localhost", username="root", password="Aman9174245164@",
+                                             database="pharma")
+              mycursor = conn.cursor()
+              mycursor.execute("Select ReportID,Tumor from tumordetection where Date=%s and PatientID=%s",
+                               (i[0], self.var02.get(),))
+              row2 = mycursor.fetchall()
+              print(row2[0][0])
 
-           dataset = []
-           label = []
+              imgbrn = Image.open(
+                  "C:/" + "Users/Aman Kumar/PycharmProjects/pythonProject/pred/" + str(row2[0][0]) + ".jpg")
+              imgbrn = imgbrn.resize((220, 400))
 
-           INPUT_SIZE = 64
+              self.photoimgbrn = ImageTk.PhotoImage(imgbrn)
+              self.video = Label(self.root, bd=10, relief=RIDGE,
+                                 bg='black', fg="darkgreen", font=("times new roman", 50, "bold"),
+                                 image=self.photoimgbrn,
+                                 padx=2, pady=4, height=500)
+              self.video.place(x=880, y=104, width=401, height=401)
 
-           print(no_tumor_images)
+              if(row2[0][1]=="Tumor"):
+                  Result = Label(self.root, bd=10, relief=RIDGE, text="Tumor", bg="black", fg="red",
+                                 font=("times new roman", 38, "bold italic"), anchor="c")
+                  Result.place(x=881, y=505, width=400, height=150)
 
-           for i, image_name in enumerate(no_tumor_images):
-               if (image_name.split('.')[1] == 'jpg'):
-                   image = cv2.imread(image_directory + 'no/' + image_name)
-                   image = Image.fromarray(image, 'RGB')
-                   image = image.resize((INPUT_SIZE, INPUT_SIZE))  # we are resizing images
-                   dataset.append(np.array(image))
-                   label.append(0)
+              else:
+                  Result = Label(self.root, bd=10, relief=RIDGE, text="No Tumor", bg="black", fg="red",
+                                 font=("times new roman", 38, "bold italic"), anchor="c")
+                  Result.place(x=881, y=505, width=400, height=150)
 
-           for i, image_name in enumerate(yes_tumor_images):
-               if (image_name.split('.')[1] == 'jpg'):
-                   image = cv2.imread(image_directory + 'yes/' + image_name)
-                   image = Image.fromarray(image, 'RGB')
-                   image = image.resize((INPUT_SIZE, INPUT_SIZE))  # we are resizing images
-                   dataset.append(np.array(image))
-                   label.append(1)
+              k = messagebox.askyesno(self.var02.get(), "Next MRI")
 
-           dataset = np.array(dataset)
-           label = np.array(label)
 
-           x_train, x_test, y_train, y_test = train_test_split(dataset, label, test_size=0.2, train_size=0.8
-                                                               , random_state=0)
-           print(x_train.shape)
-           print(y_train.shape)
 
-           print(x_test.shape)
-           print(y_test.shape)
 
-           x_train = normalize(x_train, axis=1)
-           x_test = normalize(x_train, axis=1)
 
-           y_train = to_categorical(y_train, num_classes=2)
-           y_test = to_categorical(y_test, num_classes=2)
-
-           from keras.engine.sequential import Sequential
-
-           model = Sequential()  # Initialising CNN
-           model.add(Conv2D(32, (3, 3), input_shape=(INPUT_SIZE, INPUT_SIZE, 3)))  # step -1 Convolution
-           model.add(Activation('relu'))
-           model.add(MaxPooling2D(pool_size=(2, 2)))  # step -2  Pooling
-
-           model.add(Conv2D(32, (3, 3), kernel_initializer='he_uniform'))
-           model.add(Activation('relu'))
-           model.add(MaxPooling2D(pool_size=(2, 2)))
-
-           model.add(Conv2D(64, (3, 3), kernel_initializer='he_uniform'))
-           model.add(Activation('relu'))
-           model.add(MaxPooling2D(pool_size=(2, 2)))
-
-           model.add(Flatten())
-           model.add(Dense(64))
-           model.add(Activation('relu'))
-           model.add(Dropout(0.5))
-           model.add(Dense(2))
-           model.add(Activation('sigmoid'))
-
-           model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-           res = model.fit(np.array(x_train), np.array(y_train), verbose=1, epochs=10,
-                           shuffle=False)
-
-           import matplotlib.pyplot as plt
-
-           print(res.history.keys())
-
-           plt.plot(res.history['loss'])
-           plt.title('model loss')
-           plt.ylabel('loss')
-           plt.xlabel('epoch')
-           plt.show()
-
-           print("Training accuracy")
-
-           plt.plot(res.history['accuracy'])
-           plt.title('Model Accuracy')
-           plt.legend(['Training Accuracy'])
-           plt.ylabel('Accuracy')
-           plt.xlabel('Epoch')
-           plt.show()
 
        def clear(self):
            self.var01.set("ReportID")
            self.var02.set("PatientID")
-
            self.var04.set("Doctor ID")
            self.var05.set("Tumor/No Tumor")
 
